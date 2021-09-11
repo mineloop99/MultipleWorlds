@@ -1,9 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Player;
+using Unity.Collections;
 using System.Net;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
+using Unity.Transforms;
 
-public class ClientHandle : MonoBehaviour
+public class ClientHandle
 {
     public static void Welcome(Packet _packet)
     {
@@ -14,6 +18,7 @@ public class ClientHandle : MonoBehaviour
         Client.instance.myId = _myId;
         ClientSend.WelcomeReceived();
 
+        // Now that we have the client's id, connect UDP
         Client.instance.udp.Connect(((IPEndPoint)Client.instance.tcp.socket.Client.LocalEndPoint).Port);
     }
 
@@ -31,15 +36,14 @@ public class ClientHandle : MonoBehaviour
     {
         int _id = _packet.ReadInt();
         Vector3 _position = _packet.ReadVector3();
-
-        GameManager.players[_id].transform.position = _position;
+        
+        GameManager.players[_id].position = _position;
     }
-
     public static void PlayerRotation(Packet _packet)
     {
         int _id = _packet.ReadInt();
         Quaternion _rotation = _packet.ReadQuaternion();
 
-        GameManager.players[_id].transform.rotation = _rotation;
+        GameManager.players[_id].rotation = _rotation;
     }
 }
